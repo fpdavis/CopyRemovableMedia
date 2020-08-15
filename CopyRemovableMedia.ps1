@@ -14,8 +14,6 @@ Param (
     )
 
 $Version = 1.2
-$Destination = 'F:\Data\Disk Archives\CD-DVD Archive'
-
 
 Add-Type -TypeDefinition @"
     public enum goVerbosityEnum {
@@ -132,7 +130,7 @@ Function DisplayHelp {
     MessageLog "`t`t`t                         searched for the newest empty folder to copy the source contents into."
     MessageLog "`t`t               Verbosity - Displays various levels of messaging."
     MessageLog "`t`t`t                         Debug - Super detail"
-    MessageLog "`t`t`t                         Verbose â€“ Everything Important"
+    MessageLog "`t`t`t                         Verbose – Everything Important"
     MessageLog "`t`t`t                         Information - Updates that might be useful to user"
     MessageLog "`t`t`t                         Warning - Bad things that happen, but are expected"
     MessageLog "`t`t`t                         Error - Expected errors that are not recoverable"
@@ -395,7 +393,8 @@ Function CheckForUpdate {
                     $Paramaters += " '" + $Argument.Value + "'"
                 }
             }
-            & $MyInvocation.ScriptName + $Paramaters
+            $MyInvocation.ScriptName + $Paramaters
+            Invoke-Expression ($MyInvocation.ScriptName + $Paramaters)
             exit
         }
         else {
@@ -410,7 +409,7 @@ Function CheckForUpdate {
 
 Function CalculateHash($Path) {
 
-    Get-FileHash  -Path $Path -Algorithm MD5         
+    Get-FileHash -Path $Path -Algorithm MD5         
 }
 
 
