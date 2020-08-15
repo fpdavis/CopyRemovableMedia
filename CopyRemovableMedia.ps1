@@ -13,7 +13,7 @@ Param (
     [goVerbosityEnum]$Verbosity = [goVerbosityEnum]::Verbose
     )
 
-$Version = 1.2
+$Version = 1.1
 $Destination = 'F:\Data\Disk Archives\CD-DVD Archive'
 
 
@@ -42,7 +42,7 @@ Function Main {
      }
 
      CheckForUpdate
-     exit
+
      MessageLog "`nInsert media to be copied... Ctrl-C to cancel"
 
     while ($true) {    
