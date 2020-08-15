@@ -60,7 +60,6 @@ Function Main {
     }
 }
 
-
 Function DisplayHelp {
 
     $Hash = CalculateHash $MyInvocation.ScriptName
@@ -282,8 +281,7 @@ Function CopyProcess {
     else {
         $Confirmation = $Host.UI.PromptForChoice("Confirm Copy", "Do you want to copy the "+ $Source + " to " + $DestinationDirectory + "?", ('&Yes', '&No'), 1)
     }
-
-
+    
     if (-Not $WhatIfPreference -and $Confirmation -eq 0) {
         if (-Not (Test-Path $DestinationDirectory)) {                    
             New-Item -Path $DestinationDirectory -ItemType Directory | out-null
@@ -296,8 +294,7 @@ Function CopyProcess {
     }
     else {
         MessageLog ("`nCopy skipped")
-    }
-    
+    }    
 
     start-sleep (1); 
 
@@ -373,11 +370,9 @@ Function CheckForUpdate {
     $LatestVersion = $LatestVersion.Trim().Split(":")
     if ($Version -lt $LatestVersion[0]) {
         MessageLog ("Updating from version " + $Version + " to version " + $LatestVersion[0])
-        
-        #$Script = (New-Object System.Net.WebClient).Downloadstring('https://raw.githubusercontent.com/fpdavis/CopyRemovableMedia/master/CopyRemovableMedia.ps1')
+
         $LatestVersionPath = $MyInvocation.ScriptName.Replace(".ps1", "_" + $LatestVersion[0] + ".ps1")
         $Script = (New-Object System.Net.WebClient).DownloadFile('https://raw.githubusercontent.com/fpdavis/CopyRemovableMedia/master/CopyRemovableMedia.ps1', $LatestVersionPath)
-        #Set-Content -Path $LatestVersionPath -Value $Script
 
         $Hash = CalculateHash($LatestVersionPath)
 
@@ -405,20 +400,17 @@ Function CheckForUpdate {
         }
         else {
            MessageLog ("Hash did not match $($LatestVersion[1]), skipping update.") [goVerbosityEnum]::Error
-           #Remove-Item $LatestVersionPath
+           Remove-Item $LatestVersionPath
         }
     }
     else {
        MessageLog ("Currently on latest version.")
     }
-
-    exit
 }
 
 Function CalculateHash($Path) {
 
-    Get-FileHash  -Path $Path -Algorithm MD5
-         
+    Get-FileHash  -Path $Path -Algorithm MD5         
 }
 
 
