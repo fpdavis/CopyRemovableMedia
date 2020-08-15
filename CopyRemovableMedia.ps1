@@ -13,7 +13,7 @@ Param (
     [goVerbosityEnum]$Verbosity = [goVerbosityEnum]::Verbose
     )
 
-$Version = 1.1
+$Version = 1.2
 $Destination = 'F:\Data\Disk Archives\CD-DVD Archive'
 
 
@@ -405,10 +405,8 @@ Function CheckForUpdate {
         }
         else {
            MessageLog ("Hash did not match $($LatestVersion[1]), skipping update.") [goVerbosityEnum]::Error
-           Remove-Item $LatestVersionPath
+           #Remove-Item $LatestVersionPath
         }
-
-
     }
     else {
        MessageLog ("Currently on latest version.")
