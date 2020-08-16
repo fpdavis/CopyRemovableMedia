@@ -10,7 +10,8 @@ Param (
     [switch]$NoAutoUpdate, 
     $Source = '', 
     $Destination = '.', 
-    [goVerbosityEnum]$Verbosity = [goVerbosityEnum]::Verbose
+    [ValidateSet("Critical","Error","Warning","Information","Verbose","Debug")]
+    $Verbosity
     )
 
 $Version = 1.2
@@ -27,17 +28,22 @@ Add-Type -TypeDefinition @"
 "@
 
 Function Main {
-                                                                                                                                                                                                                                                                                                           
+    
+    $DebugPreference = "SilentlyContinue"
+
+    switch ($Verbosity) {
+        "Critical"    { $gVerbosity = [goVerbosityEnum]::Critical; break }
+        "Error"       { $gVerbosity = [goVerbosityEnum];:Error; break  }
+        "Warning"     { $gVerbosity = [goVerbosityEnum]::Warning; break }
+        "Information" { $gVerbosity = [goVerbosityEnum]::Information; break }
+        "Verbose"     { $gVerbosity = [goVerbosityEnum]::Verbose; break }
+        "Debug"       { $gVerbosity = [goVerbosityEnum]::Debug; $DebugPreference = "Continue"; break }
+        default       { $gVerbosity = [goVerbosityEnum]::Information }
+    }
+
     if ($Help) {
         DisplayHelp
     }
-
-    if ($Verbosity -eq "Debug") {
-        $DebugPreference = "Continue"
-     }
-     else {
-        $DebugPreference = "SilentlyContinue"
-     }
 
      CheckForUpdate
 
@@ -79,7 +85,7 @@ Function DisplayHelp {
     MessageLog "`t`t[-WhatIf]"  
     MessageLog "`t`t[-Source 'c:\Your\Source\Directory']"
     MessageLog "`t`t[-Destination 'c:\Your\Destination\Directory']"    
-    MessageLog "`t`t[-Verbose]"
+    MessageLog "`t`t[-Verbosity Critical|Error|Warning|Information|Verbose|Debug]"
 	
     MessageLog "`nDESCRIPTION"
     MessageLog "`t`tThis program was designed to facilitate the manual process of copying and archiving removable"
@@ -90,7 +96,7 @@ Function DisplayHelp {
     MessageLog "`t`twhen the copy is complete to prompt the user to insert another disk for copy."
         
     MessageLog "`nPARAMETERS"
-    MessageLog "`t`t                    Help - Displays this help screen alond with removable/optical drive information"
+    MessageLog "`t`t                    Help - Displays this help screen along with removable/optical drive information"
     MessageLog "`t`t`t                         and then exits."
     MessageLog "`t`t         UseNewestFolder - By default the program will create a new folder in the Destination"
     MessageLog "`t`t`t                         folder with the Volume Name of the drive being copied from."
@@ -103,9 +109,9 @@ Function DisplayHelp {
     MessageLog "`t`t`t                         CopyToPopulatedDirectory parameter is specified."
     MessageLog "`t`t         SubfolderSearch - Searches the subfolders of the Destination directory when looking for the"
     MessageLog "`t`t`t                         newest folder. Otherwise the newest folder in the root directory will"
-    MessageLog "`t`t`t                         be choosen."
+    MessageLog "`t`t`t                         be chosen."
     MessageLog "`t`tCopyToPopulatedDirectory - By default the program will only copy files to an empty folder."
-    MessageLog "`t`t`t                         By specifying this paramater you are giving the program permission"
+    MessageLog "`t`t`t                         By specifying this parameter you are giving the program permission"
     MessageLog "`t`t`t                         to copy files into an existing directory that already contains files."
     MessageLog "`t`t`t                         This paramater should be used sparingly and with caution."
     MessageLog "`t`t                   Quiet - Refrains from playing a chime when the copy is complete."
@@ -121,13 +127,11 @@ Function DisplayHelp {
     MessageLog "`t`t`t                         the function. The WhatIf parameter lists the changes that the command"
     MessageLog "`t`t`t                         would make, instead of running the commands."
     MessageLog "`t`t                  Source - By default the program identifies the optical drive to copy from. This can"
-    MessageLog "`t`t`t                         be overriden."
-    MessageLog "`t`t`t                         with a different drive and even a complete file path."
+    MessageLog "`t`t`t                         be overridden with a different drive and even a complete file path."
     MessageLog "`t`t             Destination - This is the current directory by default. This is the directory where a"
-    MessageLog "`t`t`t                         new folder"
-    MessageLog "`t`t`t                         will be created based on the Voume Name of the Source Disk. If the"
-    MessageLog "`t`t`t                         UseNewestFolder is specified then this is the directory that will be"
-    MessageLog "`t`t`t                         searched for the newest empty folder to copy the source contents into."
+    MessageLog "`t`t`t                         new folder will be created based on the Volume Name of the Source Disk."
+    MessageLog "`t`t`t                         If the UseNewestFolder is specified then this is the directory that will"
+    MessageLog "`t`t`t                         be searched for the newest empty folder to copy the source contents into."
     MessageLog "`t`t               Verbosity - Displays various levels of messaging."
     MessageLog "`t`t`t                         Debug - Super detail"
     MessageLog "`t`t`t                         Verbose – Everything Important"
@@ -140,7 +144,7 @@ Function DisplayHelp {
     MessageLog "`t`t"
 
     MessageLog "`nNOTES"
-    MessageLog "`t`tDoes not recurse into symbolicly linked directores."
+    MessageLog "`t`tDoes not recurse into symbolically linked directories."
     MessageLog "`t`tLimited support for USB and floppy drives. These drive letters must be explicitly specified as the Source."
     
     # Drive type uses a numerical code:
@@ -306,7 +310,7 @@ Function CopyProcess {
 }
 
 Function MessageLog($Message, $MessageVerbosity=[goVerbosityEnum]::Information) {
-if ($MessageVerbosity.value__ -le $Verbosity.value__) {
+if ($MessageVerbosity.value__ -le $gVerbosity.value__) {
          switch ($MessageVerbosity) {
             "Critical"    { Write-Warning $Message; break }
             "Error"       { Write-Warning $Message; break  }
